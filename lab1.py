@@ -1,5 +1,4 @@
 import nltk
-from nltk.corpus import treebank
 
 sentence = "In Dusseldorf I took my hat off. But I can’t put it back on"
 
@@ -9,4 +8,6 @@ tagged = nltk.pos_tag(tokens)
 print(tagged)
 entities = nltk.chunk.ne_chunk(tagged)
 print(entities)
+
+
 
