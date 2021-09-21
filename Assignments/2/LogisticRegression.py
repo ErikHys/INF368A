@@ -62,3 +62,5 @@ for i in range(100):
     print(log_reg.predict(x))
     if (i + 1) % 10 == 0:
         print("Weights:", log_reg.weights, "Bias:", log_reg.bias)
+
+
