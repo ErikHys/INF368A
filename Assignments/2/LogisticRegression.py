@@ -24,17 +24,21 @@ class LogisticRegression:
     def predict(self, x):
         return 1 / (1 + math.exp(-vector_mult(x, self.weights, self.bias)))
 
-    def gradient(self,x, y, d_loss_func):
+    def gradient(self, x, y, d_loss_func):
         y_pred = self.predict(x)
         d_loss = d_loss_func(y, y_pred)
         gradients = [x[i]*d_loss for i in range(self.feature_length)]
         return gradients, d_loss
 
-    def train(self, data, labels, learning_rate, d_loss_func=d_LCE):
+    def gradient_descent(self, gradients, learning_rate):
+        new_w = [self.weights[i] - learning_rate * gradients[0][i] for i in range(self.feature_length)]
+        new_b = self.bias - learning_rate * gradients[1]
+        return new_w, new_b
+
+    def train(self, data, labels, learning_rate=0.1, d_loss_func=d_LCE):
         for x, y in zip(data, labels):
             gradients = self.gradient(x, y, d_loss_func)
-            new_w = [self.weights[i] - learning_rate*gradients[0][i] for i in range(self.feature_length)]
-            new_b = self.bias - learning_rate*gradients[1]
+            new_w, new_b = self.gradient_descent(gradients, learning_rate)
             self.weights = new_w
             self.bias = new_b
 
@@ -56,11 +60,14 @@ log_reg.train([x], [y], alpha)
 print(log_reg.predict(x))
 print("Weights:", log_reg.weights, "Bias:", log_reg.bias)
 
-for i in range(100):
-    print(log_reg.predict(x))
-    log_reg.train([x], [y], alpha)
-    print(log_reg.predict(x))
-    if (i + 1) % 10 == 0:
-        print("Weights:", log_reg.weights, "Bias:", log_reg.bias)
+# If you wish to try many updates to see a bigger change in the predicted value uncomment then next part
+# it does a 100 updates to the weights
+
+# for i in range(100):
+#     print(log_reg.predict(x))
+#     log_reg.train([x], [y], alpha)
+#     print(log_reg.predict(x))
+#     if (i + 1) % 10 == 0:
+#         print("Weights:", log_reg.weights, "Bias:", log_reg.bias)
 
 
