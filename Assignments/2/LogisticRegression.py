@@ -47,27 +47,33 @@ class LogisticRegression:
         self.bias = b
 
 
-x = [3, 2]
-w = [0, 0]
-b = 0
-y = 1
-alpha = 0.1
+def run_example():
+    x = [3, 2]
+    w = [0, 0]
+    b = 0
+    y = 1
+    alpha = 0.1
 
-log_reg = LogisticRegression(len(x))
-log_reg.set_weights(w, b)
-print(log_reg.predict(x))
-log_reg.train([x], [y], alpha)
-print(log_reg.predict(x))
-print("Weights:", log_reg.weights, "Bias:", log_reg.bias)
+    log_reg = LogisticRegression(len(x))
+    log_reg.set_weights(w, b)
+    print("Prediction before update:", log_reg.predict(x))
+    log_reg.train([x], [y], alpha)
+    print("Prediction after update:", log_reg.predict(x))
+    print("Weights:", log_reg.weights, "Bias:", log_reg.bias)
 
-# If you wish to try many updates to see a bigger change in the predicted value uncomment then next part
+
+# If you wish to try many updates to see a bigger change in the predicted value run then next part
 # it does a 100 updates to the weights
-
-# for i in range(100):
-#     print(log_reg.predict(x))
-#     log_reg.train([x], [y], alpha)
-#     print(log_reg.predict(x))
-#     if (i + 1) % 10 == 0:
-#         print("Weights:", log_reg.weights, "Bias:", log_reg.bias)
+def run_example2():
+    x = [3, 2]
+    y = 1
+    alpha = 0.1
+    log_reg = LogisticRegression(len(x))
+    for i in range(100):
+        print(log_reg.predict(x))
+        log_reg.train([x], [y], alpha)
+        print(log_reg.predict(x))
+        if (i + 1) % 10 == 0:
+            print("Weights:", log_reg.weights, "Bias:", log_reg.bias)
 
 
