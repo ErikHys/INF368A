@@ -2,6 +2,9 @@
 class NaiveBayesSentimentClassifier:
 
     def __init__(self):
+        """
+        Initialize attributes
+        """
         self.vocabulary_count = {}
         self.label_count = {}
         self.data_count = {}
@@ -10,6 +13,11 @@ class NaiveBayesSentimentClassifier:
         self.data_length = 0
 
     def length_setup_helper(self, data):
+        """
+        Stores the length of the of the data, and the unique length of the data.
+        Only used inside fit function.
+        :param data: all training documents
+        """
         self.data_length = len(data)
         for xi in data:
             self.data_set.extend(xi)
@@ -17,24 +25,44 @@ class NaiveBayesSentimentClassifier:
         self.data_set_length = len(self.data_set)
 
     def count_data_helper(self, key):
+        """
+        Stores the Count(wj, cj) values.
+        Only used inside fit function.
+        :param key: (Word, label) e.g. ("fast", "action")
+        """
         if key in self.data_count:
             self.data_count[key] += 1
         else:
             self.data_count[key] = 1
 
     def count_vocabulary_helper(self, y, word):
+        """
+        Used to store the total length of all documents with label y.
+        Only used inside fit function.
+        :param y: Label e.g. "comedy"
+        :param word: e.g. "fly"
+        """
         if y in self.vocabulary_count:
             self.vocabulary_count[y].append(word)
         else:
             self.vocabulary_count[y] = [y]
 
     def count_labels_helper(self, y):
+        """
+        How many times label y appears in training data
+        :param y: label
+        """
         if y in self.label_count:
             self.label_count[y] += 1
         else:
             self.label_count[y] = 1
 
     def fit(self, features, targets):
+        """
+        Fits the training data to the class instance.
+        :param features: all documents, words needs to be tokenized
+        :param targets: labels
+        """
         self.length_setup_helper(features)
 
         for x, y in zip(features, targets):
@@ -50,6 +78,11 @@ class NaiveBayesSentimentClassifier:
             self.vocabulary_count[label] = len(self.vocabulary_count[label])
 
     def predict(self, d):
+        """
+        Predicts the class label of document d
+        :param d: a list of words
+        :return: a tuple containing the predicted class and a dictionary with all class values
+        """
         results = {}
         for label in self.label_count:
             probability = self.label_count[label]
@@ -64,6 +97,9 @@ class NaiveBayesSentimentClassifier:
 
 
 def run_example():
+    """
+    Example with the data from task 1 assignment 2
+    """
     d = "fast couple shoot fly".split()
 
     data = [("fun couple love love".split(), "comedy"),
@@ -79,6 +115,9 @@ def run_example():
 
 
 def run_lecture_example():
+    """
+    Example with data from lecture 4 slide 46
+    """
     d = "predictable with no fun".split()
 
     data = [("just plain boring".split(), "-"),
@@ -93,4 +132,3 @@ def run_lecture_example():
     result = sentiment_classifier.predict(d)
     print("Predicted class:", result[0], "Values:", result[1])
 
-run_lecture_example()
