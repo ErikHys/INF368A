@@ -124,8 +124,8 @@ def run_example():
 def run_example2():
     # If you wish to try many updates to see a bigger change in the predicted value run then next part
     # it does a 100 updates to the weights
-    x = [3, 2]
-    y = 1
+    x = [3, 2, 5, 4, 3]
+    y = 0
     alpha = 0.1
     log_reg = LogisticRegression(len(x))
     for i in range(100):
@@ -134,5 +134,3 @@ def run_example2():
         print(log_reg.predict(x))
         if (i + 1) % 10 == 0:
             print("Weights:", log_reg.weights, "Bias:", log_reg.bias)
-
-
