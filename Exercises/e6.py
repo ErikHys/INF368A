@@ -19,17 +19,27 @@ plt.show()
 with open("data_e6.txt", "r") as file:
     raw_docs = file.read().split('\n\n')
 
-tf_idf = {"Shakespeare": 0, "poet": 0, "English": 0}
-for word in tf_idf:
+idf = {"Shakespeare": 0, "poet": 0, "English": 0}
+for word in idf:
     for doc in raw_docs:
         if word in doc:
-            tf_idf[word] += 1
+            idf[word] += 1
 
-for word in tf_idf:
-    tf_idf[word] = math.log10(len(raw_docs)/tf_idf[word])
+for word in idf:
+    idf[word] = math.log10(len(raw_docs)/idf[word])
 
 
-print(tf_idf)
+print(idf)
+tf = {"Shakespeare": [0, 0, 0], "poet": [0, 0, 0], "English": [0, 0, 0]}
+for word in tf:
+    for i, doc in enumerate(raw_docs):
+        a = doc.count(word)
+        tf[word][i] = math.log10(a + 1)
+print(tf)
+for word in tf:
+    a = [x*idf[word] for x in tf[word]]
+    tf[word] = a
+print(tf)
 
 #Exercise 4
 
