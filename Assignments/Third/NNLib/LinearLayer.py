@@ -35,3 +35,7 @@ class LinearLayer:
     def input_output_size(self):
         return self.input_size, self.output_size
 
+    def test_mode(self):
+        self.weights = np.ones(self.weights.shape)
+        self.bias = np.ones(self.bias.shape)
+

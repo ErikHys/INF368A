@@ -7,3 +7,7 @@ def forward(x):
     sum = np.sum(e_x, axis=1, keepdims=True)
     f_x = e_x / sum
     return f_x
+
+
+def backwards(x):
+    pass

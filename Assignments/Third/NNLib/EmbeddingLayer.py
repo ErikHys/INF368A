@@ -9,3 +9,6 @@ class EmbeddingLayer:
 
     def forward(self, x):
         return np.matmul(self.embedding, x.T).T
+
+    def test_mode(self):
+        self.embedding = np.ones(self.embedding.shape)

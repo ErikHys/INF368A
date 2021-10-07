@@ -5,6 +5,26 @@ from Assignments.Third.NNLib.LinearLayer import LinearLayer
 from Assignments.Third.NNLib import ReLU, Softmax
 
 
+def cross_entropy(y, y_pred):
+    """
+    Cross entropy loss
+    :param y: the true label
+    :param y_pred: predicted label
+    :return: the cross entropy loss
+    """
+    return -y * np.log(y_pred) + (1 - y) * np.log(1-y_pred)
+
+
+def d_LCE(y, y_pred):
+    """
+    derivative of cross entropy
+    :param y: true y value
+    :param y_pred: predicted y value
+    :return: the derivative of the cross entropy loss
+    """
+    return y_pred - y
+
+
 class MyFFLM:
 
     def __init__(self, vocab_size, embedding_size, memory_depth=3):
@@ -20,20 +40,38 @@ class MyFFLM:
         self.output_layer = LinearLayer(embedding_size, vocab_size)
         self.softmax = Softmax.forward
         self.memory_depth = memory_depth
+        self.z = {}
+        self.a = {}
+        self.dL_dw = {str(i): None for i in range(3)}
+        self.dL_db = {str(i): None for i in range(3)}
+
 
     def forward(self, x):
         # creat e with n word embeddings
         # Multiply with hidden layer
         # Pass through ReLU
         # Multiply with output layer
-        o = x[:, 0]
-        p = x[:, 1]
-        t = self.embedding_layer.forward(x[0, 0])
-        u = self.embedding_layer.forward(x[:, 0])
         e = np.array([self.embedding_layer.forward(x[:, i]) for i in range(self.memory_depth)])
-        e = np.concatenate(e, axis=1)
-        z1 = self.hidden_layer.forward(e)
-        a1 = self.ReLu(z1)
-        z2 = self.output_layer.forward(a1)
-        out = self.softmax(z2)
-        return out
+        self.z['0'] = np.concatenate(e, axis=1)
+        self.z['1'] = self.hidden_layer.forward(self.z['0'])
+        self.a['1'] = self.ReLu(self.z['1'])
+        self.z['2'] = self.output_layer.forward(self.a['1'])
+        self.a['2'] = self.softmax(self.z['2'])
+        return self.a['2']
+
+    def test_mode(self):
+        self.embedding_layer.test_mode()
+        self.hidden_layer.test_mode()
+        self.output_layer.test_mode()
+
+    def backprop(self, y_true, y_pred, dloss=d_LCE):
+        layer = 2
+        delta_curr = dloss(y_true, y_pred) * Softmax.backwards(self.z[str(layer)])
+        self.dL_dw[str(layer)] = delta_curr.reshape(np.prod(delta_curr.shape), 1) * self.a[str(layer-1)]
+        self.dL_db[str(layer)] = delta_curr
+        layers = [self.embedding_layer, self.hidden_layer]
+
+        for l in range(layer-1, 0, -1):
+            curr_l = layers[l-1]
+            delta_prev = delta_curr
+            tmp = delta_prev.reshape(np.prod(delta_prev.shape), 1) * curr_l.weights

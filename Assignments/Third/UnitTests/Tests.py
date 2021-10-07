@@ -30,10 +30,6 @@ class LayerTest(unittest.TestCase):
         self.assertTrue(np.array_equal(out, np.array([[1, 1, 0, 1], [1, 1, 0, 1], [1, 1, 0, 1], [1, 1, 0, 1]])))
 
     def test_Softmax_forwards(self):
-        # x = np.array([[1, 2, 3, 4, 5, 6],
-        #               [0, 1, 0, 0, 0, 0],
-        #               [1, 1, 1, 1, 1, 1],
-        #               [2, 1, 0, 0, 0, 0]])
         x = np.array([[1, 0], [1000, 0]])
         print(Softmax.forward(x))
 
@@ -43,7 +39,9 @@ class LayerTest(unittest.TestCase):
                       [[1, 0, 0, 0, 0, 0], [0, 0, 0, 0, 1, 0], [0, 0, 0, 0, 0, 1]],
                       [[0, 0, 0, 1, 0, 0], [0, 0, 0, 0, 0, 1], [0, 0, 0, 0, 0, 1]]])
         my_model = MyFFLM(6, 2, 3)
+        my_model.test_mode()
         y = my_model.forward(x)
+        print(y)
         print(np.sum(y, axis=1, keepdims=True))
 
 
