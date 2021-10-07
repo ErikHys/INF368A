@@ -15,7 +15,7 @@ plt.xlabel("Pie")
 plt.ylabel("Sugar")
 plt.show()
 
-# Exercise 3
+# Exercise Third
 with open("data_e6.txt", "r") as file:
     raw_docs = file.read().split('\n\n')
 

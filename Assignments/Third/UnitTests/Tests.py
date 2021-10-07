@@ -1,7 +1,8 @@
 import unittest
 import numpy as np
-import ReLU
-from LinearLayer import LinearLayer
+from Assignments.Third.NNLib import ReLU, Softmax
+from Assignments.Third.NNLib.LinearLayer import LinearLayer
+from Assignments.Third.Model import MyFFLM
 
 
 class LayerTest(unittest.TestCase):
@@ -28,11 +29,22 @@ class LayerTest(unittest.TestCase):
         out = ReLU.backwards(x)
         self.assertTrue(np.array_equal(out, np.array([[1, 1, 0, 1], [1, 1, 0, 1], [1, 1, 0, 1], [1, 1, 0, 1]])))
 
-    def test_Sigmoid_forwards(self):
-        pass
+    def test_Softmax_forwards(self):
+        # x = np.array([[1, 2, 3, 4, 5, 6],
+        #               [0, 1, 0, 0, 0, 0],
+        #               [1, 1, 1, 1, 1, 1],
+        #               [2, 1, 0, 0, 0, 0]])
+        x = np.array([[1, 0], [1000, 0]])
+        print(Softmax.forward(x))
 
-    def test_Sigmoid_backwards(self):
-        pass
+    def test_myFFLM(self):
+        x = np.array([[[0, 1, 0, 0, 0, 0], [0, 0, 1, 0, 0, 0], [0, 0, 0, 0, 0, 1]],
+                      [[0, 0, 0, 1, 0, 0], [0, 0, 0, 0, 0, 1], [0, 0, 0, 0, 0, 1]],
+                      [[1, 0, 0, 0, 0, 0], [0, 0, 0, 0, 1, 0], [0, 0, 0, 0, 0, 1]],
+                      [[0, 0, 0, 1, 0, 0], [0, 0, 0, 0, 0, 1], [0, 0, 0, 0, 0, 1]]])
+        my_model = MyFFLM(6, 2, 3)
+        y = my_model.forward(x)
+        print(np.sum(y, axis=1, keepdims=True))
 
 
 if __name__ == "__main__":

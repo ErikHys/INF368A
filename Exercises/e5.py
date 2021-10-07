@@ -57,7 +57,7 @@ b = 0
 alpha = 0.1
 print("Example gradient: ", gradient(y, x, w, b, d_LCE))
 print("Example weights after gradient descent: ", gradient_descent(gradient(y, x, w, b, d_LCE), w, b, alpha))
-print("Exercise 3:")
+print("Exercise Third:")
 y = 1
 x = [2, 4]
 w = [0.5, 0.5]

@@ -102,7 +102,7 @@ class LogisticRegression:
 
 def run_example():
     """
-    Runs the example section 5.4.3 page 87 from the book
+    Runs the example section 5.4.Third page 87 from the book
     Speech and Language Processing
     by Dan Jurafsky and James H. Martin
     prints the results to console
