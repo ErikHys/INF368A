@@ -28,7 +28,7 @@ def d_LCE(y, y_pred):
 
 class MyFFLM:
 
-    def __init__(self, vocab_size, embedding_size, memory_depth=3):
+    def __init__(self, vocab_size, embedding_size, learning_rate=0.01, memory_depth=3):
         """
 
         :param vocab_size:
@@ -41,6 +41,7 @@ class MyFFLM:
         self.output_layer = LinearLayer(embedding_size, vocab_size)
         self.softmax = Softmax.forward
         self.memory_depth = memory_depth
+        self.learning_rate = learning_rate
         self.z = {}
         self.a = {}
         self.dL_dw = {str(i): None for i in range(3)}
@@ -78,5 +79,11 @@ class MyFFLM:
             delta_curr = np.sum(tmp, axis=0, keepdims=True) * ReLU.backwards(self.z[str(l)])
             self.dL_dw[str(l)] = delta_curr.reshape(np.prod(delta_curr.shape), 1) * self.a[str(l)]
             self.dL_db = delta_curr
+        self.update()
 
-
+    def update(self):
+        self.embedding_layer.embedding -= self.learning_rate*self.dL_dw['0']
+        self.hidden_layer.weights -= self.learning_rate*self.dL_dw['1']
+        self.hidden_layer.bias -= self.learning_rate*self.dL_db['1']
+        self.output_layer.weights -= self.learning_rate * self.dL_dw['2']
+        self.output_layer.bias -= self.learning_rate * self.dL_db['2']
