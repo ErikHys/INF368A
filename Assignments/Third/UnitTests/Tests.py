@@ -1,8 +1,11 @@
 import unittest
 import numpy as np
+import torch
+
 from Assignments.Third.NNLib import ReLU, Softmax
 from Assignments.Third.NNLib.LinearLayer import LinearLayer
 from Assignments.Third.Model import MyFFLM
+from Assignments.Third.PythorchComparison import PyToFFLM
 
 
 class LayerTest(unittest.TestCase):
@@ -31,7 +34,9 @@ class LayerTest(unittest.TestCase):
 
     def test_Softmax_forwards(self):
         x = np.array([[1, 0], [1000, 0]])
-        print(Softmax.forward(x))
+        y = Softmax.forward(x)
+        self.assertTrue(np.array_equal(np.sum(y, axis=1, keepdims=True), np.array([[1], [1]])))
+
 
     def test_myFFLM(self):
         x = np.array([[[0, 1, 0, 0, 0, 0], [0, 0, 1, 0, 0, 0], [0, 0, 0, 0, 0, 1]],
@@ -39,11 +44,21 @@ class LayerTest(unittest.TestCase):
                       [[1, 0, 0, 0, 0, 0], [0, 0, 0, 0, 1, 0], [0, 0, 0, 0, 0, 1]],
                       [[0, 0, 0, 1, 0, 0], [0, 0, 0, 0, 0, 1], [0, 0, 0, 0, 0, 1]]])
         my_model = MyFFLM(6, 2, 3)
+        pytorch_comparison = PyToFFLM(6, 2, 3)
+        pytorch_comparison.test_mode()
         my_model.test_mode()
-        y = my_model.forward(x)
-        print(y)
-        print(np.sum(y, axis=1, keepdims=True))
+        y = np.round(my_model.forward(x), 4)
+        y_ = np.round(pytorch_comparison(torch.tensor(x).type(torch.FloatTensor)).detach().numpy().astype('float64'), 4)
+        print(y, y_, sep='\n')
+        self.assertTrue(np.array_equal(y, y_))
 
+    def test_myFFLM_back(self):
+        x = np.array([[[0, 1, 0, 0, 0, 0], [0, 0, 1, 0, 0, 0], [0, 0, 0, 0, 0, 1]],
+                      [[0, 0, 0, 1, 0, 0], [0, 0, 0, 0, 0, 1], [0, 0, 0, 0, 0, 1]],
+                      [[1, 0, 0, 0, 0, 0], [0, 0, 0, 0, 1, 0], [0, 0, 0, 0, 0, 1]],
+                      [[0, 0, 0, 1, 0, 0], [0, 0, 0, 0, 0, 1], [0, 0, 0, 0, 0, 1]]])
+        my_model = MyFFLM(6, 2, 3)
+        my_model.test_mode()
 
 if __name__ == "__main__":
     unittest.main()

@@ -57,12 +57,12 @@ def training_loop(n_epochs, optimizer, model, loss_fn, train_loader):
                 loss_train / len(train_loader)))
 
 
-m1 = PyToFFLM(6, 2, 3)
-
-x = torch.tensor(np.array([[[0, 1, 0, 0, 0, 0], [0, 0, 1, 0, 0, 0], [0, 0, 0, 0, 0, 1]],
-              [[0, 0, 0, 1, 0, 0], [0, 0, 0, 0, 0, 1], [0, 0, 0, 0, 0, 1]],
-              [[1, 0, 0, 0, 0, 0], [0, 0, 0, 0, 1, 0], [0, 0, 0, 0, 0, 1]],
-              [[0, 0, 0, 1, 0, 0], [0, 0, 0, 0, 0, 1], [0, 0, 0, 0, 0, 1]]])).type(torch.FloatTensor)
-m1.test_mode()
-out = m1(x)
-print(out)
+# m1 = PyToFFLM(6, 2, 3)
+#
+# x = torch.tensor(np.array([[[0, 1, 0, 0, 0, 0], [0, 0, 1, 0, 0, 0], [0, 0, 0, 0, 0, 1]],
+#               [[0, 0, 0, 1, 0, 0], [0, 0, 0, 0, 0, 1], [0, 0, 0, 0, 0, 1]],
+#               [[1, 0, 0, 0, 0, 0], [0, 0, 0, 0, 1, 0], [0, 0, 0, 0, 0, 1]],
+#               [[0, 0, 0, 1, 0, 0], [0, 0, 0, 0, 0, 1], [0, 0, 0, 0, 0, 1]]])).type(torch.FloatTensor)
+# m1.test_mode()
+# out = m1(x)
+# print(out)

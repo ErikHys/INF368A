@@ -25,6 +25,7 @@ def d_LCE(y, y_pred):
     return y_pred - y
 
 
+
 class MyFFLM:
 
     def __init__(self, vocab_size, embedding_size, memory_depth=3):
@@ -45,7 +46,6 @@ class MyFFLM:
         self.dL_dw = {str(i): None for i in range(3)}
         self.dL_db = {str(i): None for i in range(3)}
 
-
     def forward(self, x):
         # creat e with n word embeddings
         # Multiply with hidden layer
@@ -53,7 +53,8 @@ class MyFFLM:
         # Multiply with output layer
         e = np.array([self.embedding_layer.forward(x[:, i]) for i in range(self.memory_depth)])
         self.z['0'] = np.concatenate(e, axis=1)
-        self.z['1'] = self.hidden_layer.forward(self.z['0'])
+        self.a['0'] = np.concatenate(e, axis=1)
+        self.z['1'] = self.hidden_layer.forward(self.a['0'])
         self.a['1'] = self.ReLu(self.z['1'])
         self.z['2'] = self.output_layer.forward(self.a['1'])
         self.a['2'] = self.softmax(self.z['2'])
@@ -66,12 +67,16 @@ class MyFFLM:
 
     def backprop(self, y_true, y_pred, dloss=d_LCE):
         layer = 2
-        delta_curr = dloss(y_true, y_pred) * Softmax.backwards(self.z[str(layer)])
+        delta_curr = dloss(y_true, y_pred)
         self.dL_dw[str(layer)] = delta_curr.reshape(np.prod(delta_curr.shape), 1) * self.a[str(layer-1)]
         self.dL_db[str(layer)] = delta_curr
         layers = [self.embedding_layer, self.hidden_layer]
-
-        for l in range(layer-1, 0, -1):
-            curr_l = layers[l-1]
+        for l in range(layer-1, -1, -1):
+            curr_l = layers[l]
             delta_prev = delta_curr
             tmp = delta_prev.reshape(np.prod(delta_prev.shape), 1) * curr_l.weights
+            delta_curr = np.sum(tmp, axis=0, keepdims=True) * ReLU.backwards(self.z[str(l)])
+            self.dL_dw[str(l)] = delta_curr.reshape(np.prod(delta_curr.shape), 1) * self.a[str(l)]
+            self.dL_db = delta_curr
+
+
