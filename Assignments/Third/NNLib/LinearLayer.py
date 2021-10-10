@@ -8,7 +8,7 @@ class LinearLayer:
         assert isinstance(output_size, int), "output_size should be an int"
 
         rand = np.random.default_rng(seed=random_seed)
-        self.weights = rand.random((input_size, output_size))
+        self.weights = rand.random((output_size, input_size))
         self.bias = rand.random(output_size)
         self.input_size = input_size
         self.output_size = output_size
@@ -16,7 +16,7 @@ class LinearLayer:
     def forward(self, x):
         # assert x.shape[1] == self.weights.shape[0], f"Mismatching dimension between input features {x.shape[1]} and " \
         #                                             f"weights {self.weights.shape[0]} "
-        return np.matmul(x, self.weights)
+        return np.matmul(self.weights, x)
 
     def get_weights(self):
         return self.weights

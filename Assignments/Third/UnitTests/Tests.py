@@ -47,18 +47,22 @@ class LayerTest(unittest.TestCase):
         pytorch_comparison = PyToFFLM(6, 2, 3)
         pytorch_comparison.test_mode()
         my_model.test_mode()
-        y = np.round(my_model.forward(x), 4)
+        y = np.round(my_model.forward(x).T, 4)
         y_ = np.round(pytorch_comparison(torch.tensor(x).type(torch.FloatTensor)).detach().numpy().astype('float64'), 4)
-        print(y, y_, sep='\n')
         self.assertTrue(np.array_equal(y, y_))
 
     def test_myFFLM_back(self):
-        x = np.array([[[0, 1, 0, 0, 0, 0], [0, 0, 1, 0, 0, 0], [0, 0, 0, 0, 0, 1]],
-                      [[0, 0, 0, 1, 0, 0], [0, 0, 0, 0, 0, 1], [0, 0, 0, 0, 0, 1]],
-                      [[1, 0, 0, 0, 0, 0], [0, 0, 0, 0, 1, 0], [0, 0, 0, 0, 0, 1]],
-                      [[0, 0, 0, 1, 0, 0], [0, 0, 0, 0, 0, 1], [0, 0, 0, 0, 0, 1]]])
+        x = np.array([[[0, 1, 0, 0, 0, 0], [0, 0, 1, 0, 0, 0], [0, 0, 0, 0, 0, 1]]])
         my_model = MyFFLM(6, 2, 3)
         my_model.test_mode()
+        y = np.array([[1, 0, 0, 0, 0, 0]])
+        for i in range(500):
+            y_pred = my_model.forward(x)
+            my_model.backprop(np.array([y]), np.array([y_pred]))
+            if i % 25 == 0:
+                print(y_pred)
+
+
 
 if __name__ == "__main__":
     unittest.main()

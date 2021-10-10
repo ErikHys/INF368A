@@ -11,12 +11,17 @@ class PyToFFLM(torch.nn.Module):
         self.h = torch.nn.Linear(memory*output_size, output_size)
         self.a1 = torch.nn.ReLU()
         self.out = torch.nn.Linear(output_size, input_size)
-        self.sm = torch.nn.Softmax()
+        self.sm = torch.nn.Softmax(dim=1)
         self.memory = memory
 
     def forward(self, x):
+        print(x.shape)
         e = torch.cat([self.em(x[:, i]) for i in range(self.memory)], 1)
+        print(self.em.weight.shape)
+        print(e.shape)
         z1 = self.h(e)
+        print(self.h.weight.shape)
+        print(z1.shape)
         a1 = self.a1(z1)
         z2 = self.out(a1)
         out = self.sm(z2)
@@ -57,12 +62,13 @@ def training_loop(n_epochs, optimizer, model, loss_fn, train_loader):
                 loss_train / len(train_loader)))
 
 
-# m1 = PyToFFLM(6, 2, 3)
-#
-# x = torch.tensor(np.array([[[0, 1, 0, 0, 0, 0], [0, 0, 1, 0, 0, 0], [0, 0, 0, 0, 0, 1]],
-#               [[0, 0, 0, 1, 0, 0], [0, 0, 0, 0, 0, 1], [0, 0, 0, 0, 0, 1]],
-#               [[1, 0, 0, 0, 0, 0], [0, 0, 0, 0, 1, 0], [0, 0, 0, 0, 0, 1]],
-#               [[0, 0, 0, 1, 0, 0], [0, 0, 0, 0, 0, 1], [0, 0, 0, 0, 0, 1]]])).type(torch.FloatTensor)
-# m1.test_mode()
-# out = m1(x)
-# print(out)
+m1 = PyToFFLM(6, 2, 3)
+
+x = torch.tensor(np.array([[[0, 1, 0, 0, 0, 0], [0, 0, 1, 0, 0, 0], [0, 0, 0, 0, 0, 1]],
+              [[0, 0, 0, 1, 0, 0], [0, 0, 0, 0, 0, 1], [0, 0, 0, 0, 0, 1]],
+              [[1, 0, 0, 0, 0, 0], [0, 0, 0, 0, 1, 0], [0, 0, 0, 0, 0, 1]],
+              [[0, 0, 0, 1, 0, 0], [0, 0, 0, 0, 0, 1], [0, 0, 0, 0, 0, 1]]])).type(torch.FloatTensor)
+m1.test_mode()
+out = m1(x)
+print(out)
+print(m1.em.weight.shape)
