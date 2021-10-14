@@ -25,7 +25,6 @@ def d_LCE(y, y_pred):
     return y_pred - y
 
 
-
 class MyFFLM:
 
     def __init__(self, vocab_size, embedding_size, learning_rate=0.01, memory_depth=3):
@@ -41,6 +40,8 @@ class MyFFLM:
         self.output_layer = LinearLayer(embedding_size, vocab_size)
         self.softmax = Softmax.forward
         self.memory_depth = memory_depth
+        self.embedding_size = embedding_size
+        self.vocab_size = vocab_size
         self.learning_rate = learning_rate
         self.z = {}
         self.a = {}
@@ -54,15 +55,16 @@ class MyFFLM:
         # Multiply with hidden layer
         # Pass through ReLU
         # Multiply with output layer
+        x = x.T
         self.a['-1'] = x
         e = np.array([self.embedding_layer.forward(x[:, i]) for i in range(self.memory_depth)])
-        self.z['0'] = np.concatenate(e, axis=0)
-        self.a['0'] = np.concatenate(e, axis=0)
+        self.z['0'] = np.concatenate(e, axis=0).reshape((self.memory_depth*self.embedding_size, 1))
+        self.a['0'] = self.z['0']
         self.z['1'] = self.hidden_layer.forward(self.a['0'])
         self.a['1'] = self.ReLu(self.z['1'])
         self.z['2'] = self.output_layer.forward(self.a['1'])
         self.a['2'] = self.softmax(self.z['2'])
-        return self.a['2']
+        return self.a['2'].reshape(1, self.vocab_size)
 
     def test_mode(self):
         self.embedding_layer.test_mode()
@@ -70,45 +72,19 @@ class MyFFLM:
         self.output_layer.test_mode()
 
     def backprop(self, y_true, y_pred, dloss=d_LCE):
-        deltas = {str(i): None for i in range(3)}
-        last_layer = None
-        layers = [self.embedding_layer, self.hidden_layer, self.output_layer]
-        for n, (yy_t, yy_p) in enumerate(zip(y_true, y_pred)):
-            for i_layer in range(2, -1, -1):
-                layer = layers[i_layer]
-                if i_layer == 2:
-                    e_i = dloss(yy_t, yy_p)
-                else:
-                    e_i = np.zeros(layer.weights.shape)
-                    for i in range(layer.weights.shape[0]):
-                        e_i[i] = 0
-                        for k in range(last_layer.weights.shape[0]):
-                            weights_layer_plus1_k_i = last_layer.weights[k, i]
-                            last_delta = deltas[str(i_layer + 1)][k]
-                            e_i[i] += last_delta + weights_layer_plus1_k_i
-                f_prime = self.df[str(i_layer)](self.z[str(i_layer)])
-                if i_layer > 0:
-                    delta = np.matmul(e_i.T, f_prime)
-                    deltas[str(i_layer)] = delta
-                    self.dL_db[str(i_layer)] = delta
-                    new_dL_dw = np.zeros(layer.weights.shape)
-                    for i in range(new_dL_dw.shape[0]):
-                        for j in range(new_dL_dw.shape[1]):
-                            new_dL_dw[i, j] = delta[i, 0] * self.a[str(i_layer-1)][j, 0]
-                    self.dL_dw[str(i_layer)] = new_dL_dw
-                    last_layer = layer
-                else:
-                    for m, k in enumerate(range(0, f_prime.shape[0], 2)):
-                        delta = np.matmul(e_i.T, f_prime[k:k+2])
-                        deltas[str(i_layer)] = delta
-                        self.dL_db[str(i_layer)] = delta
-                        new_dL_dw = np.zeros(layer.weights.shape)
-                        for i in range(new_dL_dw.shape[0]):
-                            for j in range(new_dL_dw.shape[1]):
-                                new_dL_dw[i, j] = delta[i, 0] * self.a[str(i_layer - 1)][n, m, j]
-                        self.dL_dw[str(i_layer)][m] = new_dL_dw
-                    last_layer = layer
-            self.update()
+        dl_da2 = dloss(y_true, y_pred)
+        dl_dz2 = np.matmul(dl_da2.T, self.a['1'].T)
+        dl_da1 = np.matmul(dl_dz2, self.df['1'](self.z['1']))
+        dl_dz1 = dl_da1 * self.a['0']
+        dl_da0 = dl_dz1 * self.df['0'](self.z['0'])
+        dl_dz0 = dl_da0 * self.a['-1']
+        self.dL_dw['2'] = dl_dz2
+        self.dL_dw['1'] = dl_dz1
+        self.dL_dw['0'] = dl_dz0
+        self.dL_db['2'] = dl_da2
+        self.dL_db['1'] = dl_da1
+        self.dL_db['0'] = dl_da0
+        self.update()
 
     def update(self):
         for i in range(self.memory_depth):

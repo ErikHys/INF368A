@@ -52,13 +52,13 @@ class LayerTest(unittest.TestCase):
         self.assertTrue(np.array_equal(y, y_))
 
     def test_myFFLM_back(self):
-        x = np.array([[[0, 1, 0, 0, 0, 0], [0, 0, 1, 0, 0, 0], [0, 0, 0, 0, 0, 1]]])
+        x = np.array([[0, 1, 0, 0, 0, 0], [0, 0, 1, 0, 0, 0], [0, 0, 0, 0, 0, 1]])
         my_model = MyFFLM(6, 2, 3)
         my_model.test_mode()
-        y = np.array([[1, 0, 0, 0, 0, 0]])
+        y = np.array([1, 0, 0, 0, 0, 0])
         for i in range(500):
             y_pred = my_model.forward(x)
-            my_model.backprop(np.array([y]), np.array([y_pred]))
+            my_model.backprop(np.array([y]), y_pred)
             if i % 25 == 0:
                 print(y_pred)
 

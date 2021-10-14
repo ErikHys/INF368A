@@ -7,7 +7,7 @@ class PyToFFLM(torch.nn.Module):
 
     def __init__(self, input_size, output_size, memory=2):
         super().__init__()
-        self.em = torch.nn.Linear(input_size, output_size)
+        self.em = torch.nn.Linear(input_size, output_size, bias=False)
         self.h = torch.nn.Linear(memory*output_size, output_size)
         self.a1 = torch.nn.ReLU()
         self.out = torch.nn.Linear(output_size, input_size)
@@ -15,20 +15,21 @@ class PyToFFLM(torch.nn.Module):
         self.memory = memory
 
     def forward(self, x):
-        print(x.shape)
         e = torch.cat([self.em(x[:, i]) for i in range(self.memory)], 1)
-        print(self.em.weight.shape)
-        print(e.shape)
+        print(self.em.weight.shape, "Embed shape")
         z1 = self.h(e)
-        print(self.h.weight.shape)
-        print(z1.shape)
+        print(e.shape, 'e shape')
+        print(self.h.weight.shape, "Hidden shape")
+        print(z1.shape, "z1, e * hidden ish")
+        print(self.out.weight.shape, "Output shape")
+
         a1 = self.a1(z1)
         z2 = self.out(a1)
+        print(z2, "out * z1")
         out = self.sm(z2)
         return out
 
     def test_mode(self):
-        self.em.bias.data = torch.ones(self.em.bias.shape)
         self.em.weight.data = torch.ones(self.em.weight.shape)
         self.h.bias.data = torch.ones(self.h.bias.shape)
         self.h.weight.data = torch.ones(self.h.weight.shape)
@@ -63,12 +64,14 @@ def training_loop(n_epochs, optimizer, model, loss_fn, train_loader):
 
 
 m1 = PyToFFLM(6, 2, 3)
-
-x = torch.tensor(np.array([[[0, 1, 0, 0, 0, 0], [0, 0, 1, 0, 0, 0], [0, 0, 0, 0, 0, 1]],
-              [[0, 0, 0, 1, 0, 0], [0, 0, 0, 0, 0, 1], [0, 0, 0, 0, 0, 1]],
-              [[1, 0, 0, 0, 0, 0], [0, 0, 0, 0, 1, 0], [0, 0, 0, 0, 0, 1]],
-              [[0, 0, 0, 1, 0, 0], [0, 0, 0, 0, 0, 1], [0, 0, 0, 0, 0, 1]]])).type(torch.FloatTensor)
+opt = torch.optim.SGD(m1.parameters(), lr=0.01)
+loss = torch.nn.CrossEntropyLoss()
+x = torch.tensor(np.array([[[0, 1, 0, 0, 0, 0], [0, 0, 1, 0, 0, 0], [0, 0, 0, 0, 0, 1]]])).type(torch.FloatTensor)
+y = torch.tensor(np.array([0])).type(torch.LongTensor)
 m1.test_mode()
 out = m1(x)
-print(out)
-print(m1.em.weight.shape)
+l = loss(out, y)
+l.backward()
+for p in m1.parameters():
+    print(p.grad, p.grad.shape, p.shape)
+

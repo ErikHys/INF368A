@@ -8,7 +8,7 @@ class EmbeddingLayer:
         self.weights = rand.random((embedding_size, vocab_size))
 
     def forward(self, x):
-        return np.matmul(self.weights, x.T)
+        return np.matmul(self.weights, x)
 
     def test_mode(self):
         self.weights = np.ones(self.weights.shape)

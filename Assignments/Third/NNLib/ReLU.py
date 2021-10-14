@@ -6,4 +6,5 @@ def forward(x):
 
 
 def backwards(x):
-    return np.ones(x.shape) * (x > 0)
+    back = (x > 0).astype('float32')
+    return back
