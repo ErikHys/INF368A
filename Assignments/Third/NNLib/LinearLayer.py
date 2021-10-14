@@ -16,8 +16,8 @@ class LinearLayer:
     def forward(self, x):
         assert x.shape[0] == self.weights.shape[1], f"Mismatching dimension between input features {x.shape[1]} and " \
                                                     f"weights {self.weights.shape[0]} "
-        wx = np.matmul(self.weights, x)
-        wxb = wx + self.bias.reshape((-1, 1))
+        wx = np.matmul(self.weights, x.T)
+        wxb = wx + self.bias
         return wxb
 
     def get_weights(self):

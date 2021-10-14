@@ -58,7 +58,7 @@ class LayerTest(unittest.TestCase):
         y = np.array([1, 0, 0, 0, 0, 0])
         for i in range(500):
             y_pred = my_model.forward(x)
-            my_model.backprop(np.array([y]), y_pred)
+            my_model.backprop(np.array(y), y_pred)
             if i % 25 == 0:
                 print(y_pred)
 
