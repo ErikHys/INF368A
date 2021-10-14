@@ -6,5 +6,4 @@ def forward(x):
 
 
 def backwards(x):
-    back = (x > 0).astype('float32')
-    return back
+    return (x > 0).astype('float32')
