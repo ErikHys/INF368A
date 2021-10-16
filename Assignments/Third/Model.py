@@ -56,14 +56,13 @@ class MyFFLM:
         # Pass through ReLU
         # Multiply with output layer
         self.a['-1'] = x
-        e = np.array([self.embedding_layer.forward(x[i, :]) for i in range(self.memory_depth)])
+        e = np.array([self.embedding_layer.forward(x[i]) for i in range(self.memory_depth)])
         self.z['0'] = np.concatenate(e, axis=0)
         self.a['0'] = self.z['0']
         self.z['1'] = self.hidden_layer.forward(self.a['0'])
         self.a['1'] = self.ReLu(self.z['1'])
         self.z['2'] = self.output_layer.forward(self.a['1'])
         self.a['2'] = self.softmax(self.z['2']).reshape(1, self.vocab_size)
-        print(self.a['2'])
         return self.a['2']
 
     def test_mode(self):
