@@ -3,7 +3,7 @@ import numpy as np
 
 class LinearLayer:
 
-    def __init__(self, input_size, output_size, random_seed=27):
+    def __init__(self, input_size, output_size, random_seed=58):
         assert isinstance(input_size, int), "input size should be an int, maybe you need to flatten your input data"
         assert isinstance(output_size, int), "output_size should be an int"
 
