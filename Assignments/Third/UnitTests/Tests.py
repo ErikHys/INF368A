@@ -4,7 +4,7 @@ import torch
 
 from Assignments.Third.NNLib import ReLU, Softmax
 from Assignments.Third.NNLib.LinearLayer import LinearLayer
-from Assignments.Third.Model import MyFFLM
+from Assignments.Third.Model import MyFFLM, cross_entropy
 from Assignments.Third.PythorchComparison import PyToFFLM
 
 
@@ -53,14 +53,18 @@ class LayerTest(unittest.TestCase):
 
     def test_myFFLM_back(self):
         x = np.array([[0, 1, 0, 0, 0, 0], [0, 0, 1, 0, 0, 0], [0, 0, 0, 0, 0, 1]])
-        my_model = MyFFLM(6, 2, 3)
+        my_model = MyFFLM(6, 2, learning_rate=0.001, memory_depth=3)
         my_model.test_mode()
-        y = np.array([1, 0, 0, 0, 0, 0])
-        for i in range(500):
+        y = np.array([0, 1, 0, 0, 0, 0])
+        for i in range(1):
             y_pred = my_model.forward(x)
             my_model.backprop(np.array(y), y_pred)
-            if i % 25 == 0:
-                print(y_pred)
+            print("Loss: ", cross_entropy(y, y_pred))
+            if i % 100 == 0 or i == 999:
+                print("pred: ", y_pred)
+                for i in range(3):
+                    print(my_model.dL_dw[str(i)])
+                    print(my_model.dL_db[str(i)])
 
 
 

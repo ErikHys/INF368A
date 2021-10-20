@@ -69,11 +69,12 @@ def training_loop(n_epochs, optimizer, model, loss_fn, train_loader):
 # x = torch.tensor(np.array([[[0, 1, 0, 0, 0, 0], [0, 0, 1, 0, 0, 0], [0, 0, 0, 0, 0, 1]]])).type(torch.FloatTensor)
 # y = torch.tensor(np.array([0])).type(torch.LongTensor)
 # m1.test_mode()
-# out = m1(x)
-# print(out)
-# l = loss(out, y)
-# print(l)
-# l.backward()
-# for p in m1.parameters():
-#     print(p.grad, p.grad.shape, p.shape)
+# for _ in range(1):
+#     out = m1(x)
+#     print(out)
+#     l = loss(out, y)
+#     print(l)
+#     l.backward()
+#     for p in m1.parameters():
+#         print(p.grad, p.grad.shape, p.shape)
 

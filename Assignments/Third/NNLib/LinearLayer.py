@@ -8,8 +8,8 @@ class LinearLayer:
         assert isinstance(output_size, int), "output_size should be an int"
 
         rand = np.random.default_rng(seed=random_seed)
-        self.weights = rand.random((output_size, input_size))
-        self.bias = rand.random(output_size)
+        self.weights = rand.random((output_size, input_size), dtype='float32')
+        self.bias = rand.random(output_size, dtype='float32')
         self.input_size = input_size
         self.output_size = output_size
 
