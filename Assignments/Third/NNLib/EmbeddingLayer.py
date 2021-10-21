@@ -8,6 +8,8 @@ class EmbeddingLayer:
         self.weights = rand.random((embedding_size, vocab_size), dtype='float32')
 
     def forward(self, x):
+        assert x.shape[0] == self.weights.shape[1], f"Mismatching dimension between input features {x.shape[1]} and " \
+                                                    f"weights {self.weights.shape[0]}"
         return np.matmul(self.weights, x.T)
 
     def test_mode(self):

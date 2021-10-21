@@ -16,16 +16,10 @@ class PyToFFLM(torch.nn.Module):
 
     def forward(self, x):
         e = torch.cat([self.em(x[:, i]) for i in range(self.memory)], 1)
-        print(self.em.weight.shape, "Embed shape")
         z1 = self.h(e)
-        print(e.shape, 'e shape')
-        print(self.h.weight.shape, "Hidden shape")
-        print(z1.shape, "z1, e * hidden ish")
-        print(self.out.weight.shape, "Output shape")
 
         a1 = self.a1(z1)
         z2 = self.out(a1)
-        print(z2, "out * z1")
         out = self.sm(z2)
         return out
 
