@@ -34,6 +34,8 @@ def scale(X):
     :param X: Input data
     :return: A scaled input data where absolute value of X.max() is 1
     """
+    if np.abs(X).max() < 1000.0:
+        return X
     if not np.isfinite(X).all():
         return X * 0
     denom = np.abs(X).max()
@@ -43,16 +45,16 @@ def scale(X):
 
 class MyFFLM:
 
-    def __init__(self, vocab_size, embedding_size, learning_rate=0.01, memory_depth=3):
+    def __init__(self, vocab_size, embedding_size, hidden_size, learning_rate=0.01, memory_depth=3):
         """
         :param vocab_size:
         :param embedding_size:
         :param memory_depth:
         """
         self.embedding_layer = EmbeddingLayer(vocab_size, embedding_size)
-        self.hidden_layer = LinearLayer(memory_depth*embedding_size, 512)
+        self.hidden_layer = LinearLayer(memory_depth*embedding_size, hidden_size)
         self.ReLu = ReLU.forward
-        self.output_layer = LinearLayer(512, vocab_size)
+        self.output_layer = LinearLayer(hidden_size, vocab_size)
         self.softmax = Softmax.forward
         self.memory_depth = memory_depth
         self.embedding_size = embedding_size
@@ -102,7 +104,7 @@ class MyFFLM:
         """
 
         # Calculate the last layer
-        delta = dloss(y_true, self.a['2']) * self.a['2']
+        delta = dloss(y_true, self.a['2']) * self.z['2']
         dl_da2 = delta
         # Multiply with input to last layer to get weight gradient
         dl_dz2 = np.matmul(delta.T, self.a['1'].reshape(1, -1))
@@ -144,3 +146,7 @@ class MyFFLM:
         self.hidden_layer.bias -= self.learning_rate*self.dL_db['1'].flatten()
         self.output_layer.weights -= self.learning_rate * self.dL_dw['2']
         self.output_layer.bias -= self.learning_rate * self.dL_db['2'].flatten()
+
+    def delta(self, y_true, dloss=d_LCE):
+        delta = dloss(y_true, self.a['2']) * self.z['2']
+        print(delta)
